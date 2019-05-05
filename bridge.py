@@ -117,7 +117,7 @@ def submit_chat_hook(hook_data):
         auth=(api_key, 'x'),
         headers={
             'Content-Type': 'application/json',
-            'User-Agent': 'Bitbucket Webhooks Integraion'
+            'User-Agent': 'Bitbucket Webhooks Integration'
         }
     )
     response.raise_for_status()

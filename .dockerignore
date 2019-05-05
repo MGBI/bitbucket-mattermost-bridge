@@ -1,0 +1,12 @@
+*.py[co]
+*.swp
+
+.dockerignore
+.env
+.git*
+
+build-docker-image.sh
+docker-compose.yml
+Dockerfile
+README.md
+run-docker.sh

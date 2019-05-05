@@ -1,4 +1,7 @@
-FROM python:2-onbuild
+FROM mgbi/python-base:2
 EXPOSE 5000
 
+ENV BRIDGE_LISTEN_ADDR= BRIDGE_LISTEN_PORT= TEAMWORK_CHAT_HOOK=
 CMD python bridge.py
+
+COPY . /srv

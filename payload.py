@@ -1,4 +1,6 @@
-
+# Event Payloads:
+# https://confluence.atlassian.com/bitbucket/event-payloads-740262817.html
+# https://confluence.atlassian.com/bitbucketserver/event-payload-938025882.html
 
 def _get_default_data():
     return {
@@ -26,6 +28,7 @@ def _set_color_from_state(state):
 def _get_issue(data, action):
     resp = _get_default_data()
     resp = _set_author_infos(resp, data)
+    resp = _set_repo_infos(resp, data)
     template = '%s a %s %s [#%s: %s](%s) (%s)'
 
     issue = data.issue
@@ -39,6 +42,7 @@ def _get_issue(data, action):
 def _get_pullrequest(data, action):
     resp = _get_default_data()
     resp = _set_author_infos(resp, data)
+    resp = _set_repo_infos(resp, data)
 
     pr = data.pullrequest
     pr_link = '[%s](%s)' % (pr.title, pr.links.html.href)
@@ -59,14 +63,22 @@ def _get_pullrequest(data, action):
 
 
 def _set_author_infos(resp, data):
+    resp['author_nickname'] = data.actor.nickname
     if data.actor.display_name == 'Anonymous':
         resp['author_name'] = data.actor.display_name
         return resp
 
     resp['author_name'] = '%s (%s)' % (data.actor.display_name,
-                                       data.actor.username)
+                                       data.actor.nickname)
     resp['author_icon'] = data.actor.links.avatar.href
     resp['author_link'] = data.actor.links.html.href
+
+    return resp
+
+
+def _set_repo_infos(resp, data):
+    resp['project_key'] = data.repository.project.key
+    resp['project_name'] = data.repository.project.name
 
     return resp
 
@@ -89,6 +101,7 @@ def issue_updated(data):
 def repo_commit_comment_created(data):
     resp = _get_default_data()
     resp = _set_author_infos(resp, data)
+    resp = _set_repo_infos(resp, data)
 
     template = 'Commented commit %s at %s'
     commit_link = '[#%s](%s)' % (data.comment.commit.hash[:7],
@@ -103,6 +116,7 @@ def repo_commit_comment_created(data):
 def repo_commit_status_created(data):
     resp = _get_default_data()
     resp = _set_author_infos(resp, data)
+    resp = _set_repo_infos(resp, data)
 
     ci_link = '[%s](%s)' % (data.commit_status.key, data.commit_status.url)
     resp['text'] = 'Launch CI build on %s' % ci_link
@@ -113,6 +127,7 @@ def repo_commit_status_created(data):
 def repo_commit_status_updated(data):
     resp = _get_default_data()
     resp = _set_author_infos(resp, data)
+    resp = _set_repo_infos(resp, data)
 
     ci_link = '[%s](%s)' % (data.commit_status.key, data.commit_status.url)
     resp['text'] = 'CI build on %s is finished' % ci_link
@@ -124,6 +139,7 @@ def repo_commit_status_updated(data):
 def repo_fork(data):
     resp = _get_default_data()
     resp = _set_author_infos(resp, data)
+    resp = _set_repo_infos(resp, data)
 
     template = 'Forked %s to %s'
     src_link = '[%s](%s)' % (data.repository.full_name,
@@ -137,6 +153,7 @@ def repo_fork(data):
 def repo_push(data):
     resp = _get_default_data()
     resp = _set_author_infos(resp, data)
+    resp = _set_repo_infos(resp, data)
 
     changesets = len(data.push.changes[0].commits)
     repo_link = '[%s](%s)' % (data.repository.full_name,
@@ -157,6 +174,7 @@ def repo_push(data):
 def repo_updated(data):
     resp = _get_default_data()
     resp = _set_author_infos(resp, data)
+    resp = _set_repo_infos(resp, data)
     repo_link = '[%s](%s)' % (data.repository.full_name,
                               data.repository.links.html.href)
 

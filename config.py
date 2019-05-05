@@ -1,21 +1,47 @@
 import os
+
+def get_env_setting(setting, default=None, obligatory=True):
+    """Get the environment setting or return an exception"""
+    var = os.getenv(setting) or default
+    if not var and obligatory:
+        raise ValueError('Set the {} env variable'.format(setting))
+    return var
+
 # Config file, please set the following settings:
 
 # host the bridge is listening for, default: 0.0.0.0
-host = os.environ.get('BRIDGE_LISTEN_ADDR', '0.0.0.0')
+host = get_env_setting('BRIDGE_LISTEN_ADDR', '0.0.0.0')
 
 # listening port, default 5000
-port = os.environ.get('BRIDGE_LISTEN_POST', 5000)
+port = int(get_env_setting('BRIDGE_LISTEN_PORT', 5000))
 
 # url to post bridged webhooks to
-webhook_url = os.environ.get('MATTERMOST_HOOK', '')
-if not webhook_url:
-    raise Exception('You need to set MATTERMOST_HOOK environment variable')
+webhook_url = get_env_setting('TEAMWORK_CHAT_HOOK')
 
 # Username showed in mattermost message
 # "Enable Overriding of Usernames from Webhooks" must be turned on to work
-username = os.environ.get('MATTERMOST_USERNAME', 'webhook')
+username = get_env_setting('MATTERMOST_USERNAME', 'webhook')
 
 # User icon showed in mattermost message
 # "Enable Overriding of Icon from Webhooks" must be turned on to work
-icon = os.environ.get('MATTERMOST_ICON', '')
+icon = get_env_setting('MATTERMOST_ICON', '', False)
+
+# map a Bitbucket project key to a Teamwork Chat channel
+channels_map = {
+}
+for i in range(1, 10):
+    try:
+        channels_map[get_env_setting('BITBUCKET_PROJECT_KEY_%u' % i)] =\
+            int(get_env_setting('TEAMWORK_CHAT_CHANNEL_ID_%u' % i))
+    except ValueError as e:
+        break
+
+# map a Bitbucket user to a Teamwork API Token
+authors_map = {
+}
+for i in range(1, 10):
+    try:
+        authors_map[get_env_setting('BITBUCKET_USER_NICKNAME_%u' % i)] =\
+            get_env_setting('TEAMWORK_USER_TOKEN_%u' % i)
+    except ValueError as e:
+        break

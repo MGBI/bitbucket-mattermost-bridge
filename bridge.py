@@ -55,7 +55,10 @@ def bridge_hook(hook=''):
             output = payload_func(data)
             # Submit the new, bridged, webhook to the mattermost
             # incoming webhook
-            submit_hook(config.webhook_url + hook, output)
+            try:
+                submit_hook(config.webhook_url + hook, output)
+            except ValueError as e:
+                return str(e) + '\n' + str(request.get_json()), 400
             return "Done"
         else:
             # In case there's no templat for the event

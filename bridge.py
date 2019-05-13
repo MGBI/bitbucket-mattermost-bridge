@@ -58,7 +58,9 @@ def bridge_hook(hook=''):
             try:
                 submit_hook(config.webhook_url + hook, output)
             except ValueError as e:
-                return str(e) + '\n' + str(request.get_json()), 400
+                msg = str(e) + '\n' + str(request.get_json())
+                print(msg)
+                return msg, 400
             return "Done"
         else:
             # In case there's no templat for the event

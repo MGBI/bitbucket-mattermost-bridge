@@ -63,13 +63,13 @@ def _get_pullrequest(data, action):
 
 
 def _set_author_infos(resp, data):
-    resp['author_nickname'] = data.actor.nickname or data.actor.username
+    username = data.actor.username or data.actor.username
+    resp['author_username'] = username
     if data.actor.display_name == 'Anonymous':
         resp['author_name'] = data.actor.display_name
         return resp
 
-    resp['author_name'] = '%s (%s)' % (data.actor.display_name,
-                                       data.actor.nickname)
+    resp['author_name'] = '%s (%s)' % (data.actor.display_name, username)
     resp['author_icon'] = data.actor.links.avatar.href
     resp['author_link'] = data.actor.links.html.href
 

@@ -63,7 +63,7 @@ def _get_pullrequest(data, action):
 
 
 def _set_author_infos(resp, data):
-    username = data.actor.username or data.actor.username
+    username = data.actor.username or data.actor.nickname
     resp['author_username'] = username
     if data.actor.display_name == 'Anonymous':
         resp['author_name'] = data.actor.display_name

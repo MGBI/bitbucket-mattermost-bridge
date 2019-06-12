@@ -135,5 +135,6 @@ def submit_chat_hook(hook_data):
 
 
 if __name__ == "__main__":
+    print("Known commit authors:\n" + '\n'.join(config.authors_map.keys()))
     # Run flask app on host, this is set in config.py
     app.run(host=config.host, port=config.port)

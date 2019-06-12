@@ -18,6 +18,7 @@ def _set_color_from_priority(priority):
         'blocker': '#000000'
     }.get(priority, '#FFFFFF')
 
+
 def _set_color_from_state(state):
     return {
         'SUCCESSFUL': 'good',
@@ -63,13 +64,14 @@ def _get_pullrequest(data, action):
 
 
 def _set_author_infos(resp, data):
-    username = data.actor.username or data.actor.nickname
-    resp['author_username'] = username
+    resp['author_nickname'] = data.actor.nickname
+    resp['author_username'] = data.actor.username
     if data.actor.display_name == 'Anonymous':
         resp['author_name'] = data.actor.display_name
         return resp
 
-    resp['author_name'] = '%s (%s)' % (data.actor.display_name, username)
+    resp['author_name'] = '%s (%s)' % (data.actor.display_name,
+                                       data.actor.username)
     resp['author_icon'] = data.actor.links.avatar.href
     resp['author_link'] = data.actor.links.html.href
 

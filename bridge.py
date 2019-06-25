@@ -57,8 +57,8 @@ def bridge_hook(hook=''):
         # incoming webhook
         try:
             submit_hook(config.webhook_url + hook, output)
-        except ValueError as e:
-            msg = str(e) + '\n' + str(request.get_json())
+        except (ValueError, AttributeError) as e:
+            msg = str(request.get_json()) + '\n' + str(e)
             print(msg)
             return msg, 400
         return "Done"
@@ -109,7 +109,8 @@ def submit_chat_hook(hook_data):
         raise ValueError("Unknown project_key `%s`" % project_key)
     url = config.webhook_url + '/chat/v5/rooms/%u/messages.json' % channel_id
 
-    author_nickname = hook_data.get('author_nickname')
+    author_nickname = hook_data.get('author_nickname') \
+        or hook_data.get('author_username')
     if not author_nickname:
         raise ValueError("Missing author_nickname in the response: %s" %
                          hook_data)

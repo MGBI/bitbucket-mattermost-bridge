@@ -157,7 +157,6 @@ def repo_push(data):
     resp = _set_author_infos(resp, data)
     resp = _set_repo_infos(resp, data)
 
-    print data.push
     changesets = len(data.push.changes[0].commits)
     repo_link = '[%s](%s)' % (data.repository.full_name,
                               data.repository.links.html.href)
@@ -168,9 +167,13 @@ def repo_push(data):
                                    commit.links.html.href,
                                    commit.message.strip().replace('\n', ' - '))
         commits.append(text)
-    template = 'Pushed %s changesets to %s at %s\n%s'
+    truncated = data.push.changes[0].truncated
+    if truncated:
+        template = 'Pushed more than %s changesets to %s at %s\n%s'
+    else:
+        template = 'Pushed %s changesets to %s at %s\n%s'
     resp['text'] = template % (changesets, branch,
-                               repo_link, '\n'.join(commits))
+                               repo_link, '\n'.join(commits) + '\n- ...')
     return resp
 
 

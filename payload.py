@@ -181,11 +181,11 @@ def repo_push(data):
         commits.append(text)
     truncated = data.push.changes[0].truncated
     if truncated:
-        template = 'Pushed more than %s changesets to %s at %s\n%s'
+        template = 'Pushed more than %s changesets to %s at %s\n%s\n- ...'
     else:
         template = 'Pushed %s changesets to %s at %s\n%s'
     resp['text'] = template % (changesets, branch,
-                               repo_link, '\n'.join(commits) + '\n- ...')
+                               repo_link, '\n'.join(commits))
     return resp
 
 

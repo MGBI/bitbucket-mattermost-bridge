@@ -1,12 +1,11 @@
 ########################################
-#   Bitbucket Mattermost Bridge        #
+#   Bitbucket Teamwork Chat Bridge     #
 #                                      #
 #   Written by Daniel Kappelle, 2016   #
 #  Modified by Mateusz Grabowski, 2019 #
 ########################################
 
 # import modules
-import json
 import requests
 from flask import Flask, request
 from pyxtension.Json import Json
@@ -15,8 +14,13 @@ from pyxtension.Json import Json
 import config
 import payload
 
+from teamwork.bridge import teamwork_app
+
 # Initialize flask app
 app = Flask(__name__)
+
+# Add Teamwork Webhook URLs
+app.register_blueprint(teamwork_app, url_prefix='/teamwork')
 
 # Folder for the template files
 template_folder = "templates/"
@@ -44,8 +48,8 @@ def bridge_hook(hook=''):
     event = request.headers.get('X-Event-Key')
 
     # The template folder is searched for a template file
-    # that matches thee event-key, (: replaced by -), e.g.
-    # repo-push
+    # that matches thee event-key, (: replaced by _), e.g.
+    # repo_push
     payload_name = event.replace(":", "_")
     payload_func = getattr(payload, payload_name, None)
 
@@ -56,7 +60,7 @@ def bridge_hook(hook=''):
         # Submit the new, bridged, webhook to the mattermost
         # incoming webhook
         try:
-            submit_hook(config.webhook_url + hook, output)
+            submit_hook(output)
         except (ValueError, AttributeError) as e:
             msg = str(request.get_json()) + '\n' + str(e)
             print(msg)
@@ -66,28 +70,11 @@ def bridge_hook(hook=''):
         # In case there's no templat for the event
         # throw an error
         print(event)
-        return "Couldn't handle this event", 501
+        return "Couldn't handle this Bitbucket event", 501
 
 
-def submit_hook(url, hook_data):
+def submit_hook(hook_data):
     return submit_chat_hook(hook_data)
-
-    # This function submits the new hook to mattermost
-    data = {
-        'attachments': [hook_data],
-        'username': config.username,
-        'icon_url': config.icon,
-    }
-    # Post the webhook
-    response = requests.post(
-        url,
-        data=json.dumps(data),
-        headers={'Content-Type': 'application/json'}
-    )
-    if response.status_code != 200:
-        err = 'Request to mattermost returned an error %s, ' \
-            'the response is:\n%s'
-        raise ValueError(err % (response.status_code, response.text))
 
 
 def submit_chat_hook(hook_data):
@@ -104,7 +91,7 @@ def submit_chat_hook(hook_data):
     project_key = hook_data.get('project_key')
     if not project_key:
         raise ValueError("Missing project_key in the response: %s" % hook_data)
-    channel_id = config.channels_map.get(project_key)
+    channel_id = config.bitbucket_map.get(project_key)
     if not channel_id:
         raise ValueError("Unknown project_key `%s`" % project_key)
     url = config.webhook_url + '/chat/v5/rooms/%u/messages.json' % channel_id
@@ -114,14 +101,14 @@ def submit_chat_hook(hook_data):
     if not author_nickname:
         raise ValueError("Missing author_nickname in the response: %s" %
                          hook_data)
-    api_key = config.authors_map.get(author_nickname)
+    api_key = config.bitbucket_users_map.get(author_nickname)
     if not api_key:
         raise ValueError("Unknown author_nickname `%s`" % author_nickname)
 
     # Post the webhook
     response = requests.post(
         url,
-        data=json.dumps(data),
+        json=data,
         auth=(api_key, 'x'),
         headers={
             'Content-Type': 'application/json',

@@ -157,6 +157,7 @@ def repo_push(data):
     resp = _set_author_infos(resp, data)
     resp = _set_repo_infos(resp, data)
 
+    print data.push
     changesets = len(data.push.changes[0].commits)
     repo_link = '[%s](%s)' % (data.repository.full_name,
                               data.repository.links.html.href)

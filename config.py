@@ -74,4 +74,4 @@ for i in range(1, max_maps):
         break
 
 # Teamwork API Token
-api_token = get_env_setting('TEAMWORK_SYSTEM_USER_TOKEN', obligatory=False)
+ci_api_token = get_env_setting('TEAMWORK_CI_USER_TOKEN', obligatory=False)

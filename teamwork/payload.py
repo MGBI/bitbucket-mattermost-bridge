@@ -36,7 +36,7 @@ def _set_comment_infos(resp, data):
 
     response = requests.get(
         __urljoin('comments', data.comment.id) + '.json',
-        auth=(config.api_token, 'x')
+        auth=(config.ci_api_token, 'x')
     )
     response.raise_for_status()
     responseData = Json(response.json())

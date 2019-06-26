@@ -1,6 +1,8 @@
 # Event Payloads:
 # https://confluence.atlassian.com/bitbucket/event-payloads-740262817.html
 # https://confluence.atlassian.com/bitbucketserver/event-payload-938025882.html
+import config
+
 
 def _get_default_data():
     return {
@@ -123,6 +125,8 @@ def repo_commit_status_created(data):
     ci_link = '[%s](%s)' % (data.commit_status.key, data.commit_status.url)
     resp['text'] = 'Launch CI build on %s' % ci_link
 
+    resp['author_token'] = config.ci_api_token
+
     return resp
 
 
@@ -132,8 +136,16 @@ def repo_commit_status_updated(data):
     resp = _set_repo_infos(resp, data)
 
     ci_link = '[%s](%s)' % (data.commit_status.key, data.commit_status.url)
-    resp['text'] = 'CI build on %s is finished' % ci_link
-    resp['color'] = _set_color_from_state(data.commit_status.state)
+    state = data.commit_status.state
+    resp['text'] = 'CI build on %s: %s' % (ci_link, state)
+    resp['color'] = _set_color_from_state(state)
+
+    resp['author_token'] = config.ci_api_token
+    userName = data.actor.username or \
+        data.actor.nickname.replace(' ', '').lower()
+
+    if state == 'FAILED':
+        resp['text'] = '@%s %s' % (userName, resp['text'])
 
     return resp
 

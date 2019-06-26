@@ -96,14 +96,16 @@ def submit_chat_hook(hook_data):
         raise ValueError("Unknown project_key `%s`" % project_key)
     url = config.webhook_url + '/chat/v5/rooms/%u/messages.json' % channel_id
 
-    author_nickname = hook_data.get('author_nickname') \
-        or hook_data.get('author_username')
-    if not author_nickname:
-        raise ValueError("Missing author_nickname in the response: %s" %
-                         hook_data)
-    api_key = config.bitbucket_users_map.get(author_nickname)
+    api_key = hook_data.get('author_token')
     if not api_key:
-        raise ValueError("Unknown author_nickname `%s`" % author_nickname)
+        author_nickname = hook_data.get('author_nickname') \
+            or hook_data.get('author_username')
+        if not author_nickname:
+            raise ValueError("Missing author_nickname in the response: %s" %
+                             hook_data)
+        api_key = config.bitbucket_users_map.get(author_nickname)
+        if not api_key:
+            raise ValueError("Unknown author_nickname `%s`" % author_nickname)
 
     # Post the webhook
     response = requests.post(

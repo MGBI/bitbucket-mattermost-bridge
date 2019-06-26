@@ -91,7 +91,8 @@ def submit_chat_hook(hook_data):
     project_key = hook_data.get('project_key')
     if not project_key:
         raise ValueError("Missing project_key in the response: %s" % hook_data)
-    channel_id = config.bitbucket_map.get(project_key)
+
+    channel_id = config.bitbucket_log_map.get(project_key)
     if not channel_id:
         raise ValueError("Unknown project_key `%s`" % project_key)
     url = config.webhook_url + '/chat/v5/rooms/%u/messages.json' % channel_id

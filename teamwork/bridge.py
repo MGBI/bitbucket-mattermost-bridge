@@ -58,7 +58,8 @@ def submit_chat_hook(hook_data):
     project_id = hook_data.get('project_id')
     if not project_id:
         raise ValueError("Missing project_id in the response: %s" % hook_data)
-    channel_id = config.teamwork_map.get(project_id)
+
+    channel_id = config.teamwork_chat_map.get(project_id)
     if not channel_id:
         raise ValueError("Unknown project_id `%s`" % project_id)
     url = config.webhook_url + '/chat/v5/rooms/%u/messages.json' % channel_id

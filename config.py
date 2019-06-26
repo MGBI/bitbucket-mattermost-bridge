@@ -33,22 +33,24 @@ icon = get_env_setting('MATTERMOST_ICON', '', False)
 max_maps = 10
 
 # map a Teamwork project id to a Teamwork Chat channel
-teamwork_map = {
+teamwork_chat_map = {
 }
 for i in range(1, max_maps):
     try:
-        teamwork_map[get_env_setting('TEAMWORK_PROJECT_ID_%u' % i)] =\
+        teamwork_chat_map[
+            int(get_env_setting('TEAMWORK_PROJECT_ID_%u' % i))] = \
             int(get_env_setting('TEAMWORK_CHAT_CHANNEL_ID_%u' % i))
     except ValueError as e:
         break
 
-# map a Bitbucket project key to a Teamwork Chat channel
-bitbucket_map = {
+# map a Bitbucket project key to a Teamwork log channel
+bitbucket_log_map = {
 }
 for i in range(1, max_maps):
     try:
-        bitbucket_map[get_env_setting('BITBUCKET_PROJECT_KEY_%u' % i)] =\
-            int(get_env_setting('TEAMWORK_CHAT_CHANNEL_ID_%u' % i))
+        bitbucket_log_map[
+            get_env_setting('BITBUCKET_PROJECT_KEY_%u' % i)] = \
+            int(get_env_setting('TEAMWORK_LOG_CHANNEL_ID_%u' % i))
     except ValueError as e:
         break
 
@@ -58,7 +60,7 @@ bitbucket_users_map = {
 for i in range(1, max_maps):
     try:
         bitbucket_users_map[
-            get_env_setting('BITBUCKET_USER_NICKNAME_%u' % i)] =\
+            get_env_setting('BITBUCKET_USER_NICKNAME_%u' % i)] = \
             get_env_setting('TEAMWORK_USER_TOKEN_%u' % i)
     except ValueError as e:
         break
@@ -68,7 +70,8 @@ teamwork_users_map = {
 }
 for i in range(1, max_maps):
     try:
-        teamwork_users_map[get_env_setting('TEAMWORK_USER_ID_%u' % i)] =\
+        teamwork_users_map[
+            int(get_env_setting('TEAMWORK_USER_ID_%u' % i))] = \
             get_env_setting('TEAMWORK_USER_TOKEN_%u' % i)
     except ValueError as e:
         break

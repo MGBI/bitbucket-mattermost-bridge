@@ -65,17 +65,18 @@ def _get_pullrequest(data, action):
     return resp
 
 
-def _set_author_infos(resp, data):
-    resp['author_nickname'] = data.actor.nickname
-    resp['author_username'] = data.actor.username
-    if data.actor.display_name == 'Anonymous':
-        resp['author_name'] = data.actor.display_name
+def _set_author_infos(resp, data, key='actor'):
+    actor = data.get(key)
+    resp['author_nickname'] = actor.nickname
+    resp['author_username'] = actor.username
+    if actor.display_name == 'Anonymous':
+        resp['author_name'] = actor.display_name
         return resp
 
-    resp['author_name'] = '%s (%s)' % (data.actor.display_name,
-                                       data.actor.username)
-    resp['author_icon'] = data.actor.links.avatar.href
-    resp['author_link'] = data.actor.links.html.href
+    resp['author_name'] = '%s (%s)' % (actor.display_name,
+                                       actor.username or actor.nickname)
+    resp['author_icon'] = actor.links.avatar.href
+    resp['author_link'] = actor.links.html.href
 
     return resp
 
@@ -166,20 +167,21 @@ def repo_fork(data):
 
 def repo_push(data):
     resp = _get_default_data()
-    resp = _set_author_infos(resp, data)
     resp = _set_repo_infos(resp, data)
+    changes = data.push.changes[0]
+    resp = _set_author_infos(resp, changes.commits[0].author, 'user')
 
-    changesets = len(data.push.changes[0].commits)
+    changesets = len(changes.commits)
     repo_link = '[%s](%s)' % (data.repository.full_name,
                               data.repository.links.html.href)
-    branch = data.push.changes[0].new.name
+    branch = changes.new.name
     commits = []
-    for commit in data.push.changes[0].commits:
+    for commit in changes.commits:
         text = '- [%s](%s): %s' % (commit.hash[:7],
                                    commit.links.html.href,
                                    commit.message.strip().replace('\n', ' - '))
         commits.append(text)
-    truncated = data.push.changes[0].truncated
+    truncated = changes.truncated
     if truncated:
         template = 'Pushed more than %s changesets to %s at %s\n%s\n- ...'
     else:

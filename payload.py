@@ -66,7 +66,7 @@ def _get_pullrequest(data, action):
 
 
 def _set_author_infos(resp, data, key='actor'):
-    actor = data.get(key)
+    actor = getattr(data, key)
     resp['author_nickname'] = actor.nickname
     resp['author_username'] = actor.username
     if actor.display_name == 'Anonymous':
@@ -120,11 +120,13 @@ def repo_commit_comment_created(data):
 
 def repo_commit_status_created(data):
     resp = _get_default_data()
-    resp = _set_author_infos(resp, data)
     resp = _set_repo_infos(resp, data)
+    resp = _set_author_infos(resp, data.commit_status.commit.author, 'user')
 
+    repo_link = '[%s](%s)' % (data.repository.full_name,
+                              data.repository.links.html.href)
     ci_link = '[%s](%s)' % (data.commit_status.key, data.commit_status.url)
-    resp['text'] = 'Launch CI build on %s' % ci_link
+    resp['text'] = 'Launch CI build at %s on %s' % (repo_link, ci_link)
 
     resp['author_token'] = config.ci_api_token
 
@@ -133,19 +135,21 @@ def repo_commit_status_created(data):
 
 def repo_commit_status_updated(data):
     resp = _get_default_data()
-    resp = _set_author_infos(resp, data)
     resp = _set_repo_infos(resp, data)
+    resp = _set_author_infos(resp, data.commit_status.commit.author, 'user')
 
-    ci_link = '[%s](%s)' % (data.commit_status.key, data.commit_status.url)
+    repo_link = '[%s](%s)' % (data.repository.full_name,
+                              data.repository.links.html.href)
+    ci_link = '[%s](%s)' % (data.commit_status.name, data.commit_status.url)
     state = data.commit_status.state
-    resp['text'] = 'CI build on %s: %s' % (ci_link, state)
+    resp['text'] = 'CI build at %s on %s: %s' % (repo_link, ci_link, state)
     resp['color'] = _set_color_from_state(state)
 
     resp['author_token'] = config.ci_api_token
-    userName = data.actor.username or \
-        data.actor.nickname.replace(' ', '').lower()
-
     if state == 'FAILED':
+        userName = data.commit_status.commit.author.user.nickname or \
+            data.commit_status.commit.author.user.username
+        userName = userName.replace(' ', '').lower()
         resp['text'] = '@%s %s' % (userName, resp['text'])
 
     return resp

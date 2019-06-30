@@ -149,7 +149,7 @@ def repo_commit_status_updated(data):
     if state == 'FAILED':
         userName = data.commit_status.commit.author.user.nickname or \
             data.commit_status.commit.author.user.username
-        userName = userName.replace(' ', '').lower()
+        userName = str(userName).replace(' ', '').lower()
         resp['text'] = '@%s %s' % (userName, resp['text'])
 
     return resp
@@ -173,7 +173,10 @@ def repo_push(data):
     resp = _get_default_data()
     resp = _set_repo_infos(resp, data)
     changes = data.push.changes[0]
-    resp = _set_author_infos(resp, changes.commits[0].author, 'user')
+    for commit in changes.commits:
+        resp = _set_author_infos(resp, commit.author, 'user')
+        if resp['author_nickname'] or resp['author_username']:
+            break
 
     changesets = len(changes.commits)
     repo_link = '[%s](%s)' % (data.repository.full_name,

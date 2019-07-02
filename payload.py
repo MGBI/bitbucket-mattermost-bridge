@@ -149,7 +149,7 @@ def repo_commit_status_updated(data):
     if state == 'FAILED':
         userName = data.commit_status.commit.author.user.nickname or \
             data.commit_status.commit.author.user.username
-        userName = str(userName).replace(' ', '').lower()
+        userName = str(userName or '').replace(' ', '').lower()
         resp['text'] = '@%s %s' % (userName, resp['text'])
 
     return resp
@@ -172,16 +172,25 @@ def repo_fork(data):
 def repo_push(data):
     resp = _get_default_data()
     resp = _set_repo_infos(resp, data)
+    repo_link = '[%s](%s)' % (data.repository.full_name,
+                              data.repository.links.html.href)
     changes = data.push.changes[0]
+
+    if changes.new is None:
+        resp = _set_author_infos(resp, data)
+        branch = changes.old.name
+        template = 'Deleted branch %s at %s'
+        resp['text'] = template % (branch, repo_link)
+        return resp
+
     for commit in changes.commits:
         resp = _set_author_infos(resp, commit.author, 'user')
         if resp['author_nickname'] or resp['author_username']:
             break
 
+    branch_link = '[%s](%s)' % (changes.new.name,
+                                changes.new.links.html.href)
     changesets = len(changes.commits)
-    repo_link = '[%s](%s)' % (data.repository.full_name,
-                              data.repository.links.html.href)
-    branch = changes.new.name
     commits = []
     for commit in changes.commits:
         text = '- [%s](%s): %s' % (commit.hash[:7],
@@ -193,7 +202,7 @@ def repo_push(data):
         template = 'Pushed more than %s changesets to %s at %s\n%s\n- ...'
     else:
         template = 'Pushed %s changesets to %s at %s\n%s'
-    resp['text'] = template % (changesets, branch,
+    resp['text'] = template % (changesets, branch_link,
                                repo_link, '\n'.join(commits))
     return resp
 

@@ -2,7 +2,7 @@ version: '2'
 
 services:
   bridge:
-    image: mgbi/bitbucket-teamworkchat-bridge
+    image: mgbi/teamworkchat-bridge
     environment:
       BRIDGE_LISTEN_ADDR: ${BRIDGE_LISTEN_ADDR}
       BRIDGE_LISTEN_PORT: ${BRIDGE_LISTEN_PORT}

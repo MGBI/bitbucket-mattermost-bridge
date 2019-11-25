@@ -1,21 +1,27 @@
 **Forked from:**
 https://github.com/danielkappelle/bitbucket-mattermost-bridge
 
-# Bitbucket -> Teamwork Chat bridge
+# Integrated Bitbucket, Teamwork Project and Sentry -> Teamwork Chat bridge.
+[![Docker Pulls](https://img.shields.io/docker/pulls/mgbi/teamworkchat-bridge.svg?maxAge=8600)][hub]
+[![License](https://img.shields.io/github/license/mgbi/teamworkchat-bridge.svg?maxAge=8600)]()
+
+[hub]: https://hub.docker.com/r/mgbi/teamworkchat-bridge/
+
+## Bitbucket -> Teamwork Chat bridge
 This tool converts the Bitbucket webhook request so that Teamwork Chat can interpret it properly.
 Code:
 ```
 ./bridge.py
 ```
 
-# Teamwork Project -> Teamwork Chat bridge
+## Teamwork Project -> Teamwork Chat bridge
 This tool converts the Teamwork Project webhook request so that Teamwork Chat can interpret it properly.
 Code:
 ```
 ./teamwork/bridge.py
 ```
 
-# Sentry -> Teamwork Chat bridge
+## Sentry -> Teamwork Chat bridge
 This tool converts the Sentry webhook request so that Teamwork Chat can interpret it properly.
 Code:
 ```

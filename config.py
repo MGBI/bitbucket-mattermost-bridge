@@ -40,7 +40,7 @@ for i in range(1, max_maps):
         teamwork_chat_map[
             int(get_env_setting('TEAMWORK_PROJECT_ID_%u' % i))] = \
             int(get_env_setting('TEAMWORK_CHAT_CHANNEL_ID_%u' % i))
-    except ValueError as e:
+    except ValueError:
         break
 
 # map a Bitbucket project key to a Teamwork log channel
@@ -51,10 +51,21 @@ for i in range(1, max_maps):
         bitbucket_log_map[
             get_env_setting('BITBUCKET_PROJECT_KEY_%u' % i)] = \
             int(get_env_setting('TEAMWORK_LOG_CHANNEL_ID_%u' % i))
-    except ValueError as e:
+    except ValueError:
         break
 
-# map a Bitbucket user to a Teamwork API Token
+# map a Sentry project id to a Teamwork log channel
+sentry_log_map = {
+}
+for i in range(1, max_maps):
+    try:
+        sentry_log_map[
+            int(get_env_setting('SENTRY_PROJECT_ID_%u' % i))] = \
+            int(get_env_setting('TEAMWORK_LOG_CHANNEL_ID_%u' % i))
+    except ValueError:
+        break
+
+# map a Bitbucket user to a Teamwork API token
 bitbucket_users_map = {
 }
 for i in range(1, max_maps):
@@ -62,10 +73,10 @@ for i in range(1, max_maps):
         bitbucket_users_map[
             get_env_setting('BITBUCKET_USER_NICKNAME_%u' % i)] = \
             get_env_setting('TEAMWORK_USER_TOKEN_%u' % i)
-    except ValueError as e:
+    except ValueError:
         break
 
-# map a Teamwork user to a Teamwork API Token
+# map a Teamwork user to a Teamwork API token
 teamwork_users_map = {
 }
 for i in range(1, max_maps):
@@ -73,7 +84,31 @@ for i in range(1, max_maps):
         teamwork_users_map[
             int(get_env_setting('TEAMWORK_USER_ID_%u' % i))] = \
             get_env_setting('TEAMWORK_USER_TOKEN_%u' % i)
-    except ValueError as e:
+    except ValueError:
+        break
+
+
+# map a Sentry user to a Teamwork API token
+sentry_users_map = {
+}
+for i in range(1, max_maps):
+    try:
+        sentry_users_map[
+            int(get_env_setting('SENTRY_USER_ID_%u' % i))] = \
+            get_env_setting('TEAMWORK_USER_TOKEN_%u' % i)
+    except ValueError:
+        break
+
+
+# map a Sentry user to a Teamwork Chat handle
+sentry_handles_map = {
+}
+for i in range(1, max_maps):
+    try:
+        sentry_handles_map[
+            int(get_env_setting('SENTRY_USER_ID_%u' % i))] = \
+            get_env_setting('TEAMWORK_USER_HANDLE_%u' % i)
+    except ValueError:
         break
 
 # Teamwork API Token

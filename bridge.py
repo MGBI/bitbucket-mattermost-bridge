@@ -15,6 +15,7 @@ import config
 import payload
 
 from teamwork.bridge import teamwork_app
+from sentry.bridge import sentry_app
 
 # Initialize flask app
 app = Flask(__name__)
@@ -22,8 +23,8 @@ app = Flask(__name__)
 # Add Teamwork Webhook URLs
 app.register_blueprint(teamwork_app, url_prefix='/teamwork')
 
-# Folder for the template files
-template_folder = "templates/"
+# Add Sentry Webhook URLs
+app.register_blueprint(sentry_app, url_prefix='/sentry')
 
 
 @app.route("/")

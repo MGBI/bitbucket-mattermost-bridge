@@ -1,5 +1,26 @@
-# Bitbucket Teamwork Chat bridge
-This tool converts the bitbucket webhook request so that Teamwork Chat can interpret it properly.
+**Forked from:**
+https://github.com/danielkappelle/bitbucket-mattermost-bridge
+
+# Bitbucket -> Teamwork Chat bridge
+This tool converts the Bitbucket webhook request so that Teamwork Chat can interpret it properly.
+Code:
+```
+./bridge.py
+```
+
+# Teamwork Project -> Teamwork Chat bridge
+This tool converts the Teamwork Project webhook request so that Teamwork Chat can interpret it properly.
+Code:
+```
+./teamwork/bridge.py
+```
+
+# Sentry -> Teamwork Chat bridge
+This tool converts the Sentry webhook request so that Teamwork Chat can interpret it properly.
+Code:
+```
+./sentry/bridge.py
+```
 
 # Installation
 This installation guide is based on `Ubuntu 14.04` with `Python 2.7` and `pip` installed.

@@ -24,6 +24,9 @@ def bridge_hook():
         # Parse the json data from the webhook
         data = Json(request.get_json())
         output = payload_func(data)
+        if not output:
+            print("%s ignored" % event)
+            return "Ignored"
         # Submit the new, bridged, webhook to the mattermost
         # incoming webhook
         try:

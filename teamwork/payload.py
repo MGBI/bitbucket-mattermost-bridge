@@ -11,6 +11,12 @@ def __urljoin(*urls):
     return "{}/{}".format(base, "/".join(map(str, urls)))
 
 
+def __get(url):
+    response = requests.get(url, auth=(config.ci_api_token, 'x'))
+    response.raise_for_status()
+    return Json(response.json())
+
+
 def _get_default_data():
     return {
         'color': '#FFFFFF',
@@ -34,12 +40,7 @@ def _set_comment_infos(resp, data):
     resp['comment_body'] = data.comment.body
     resp['comment_object_type'] = data.comment.objectType
 
-    response = requests.get(
-        __urljoin('comments', data.comment.id) + '.json',
-        auth=(config.ci_api_token, 'x')
-    )
-    response.raise_for_status()
-    responseData = Json(response.json())
+    responseData = __get(__urljoin('comments', data.comment.id) + '.json')
     resp['comment_link'] = __urljoin(
         '#' + responseData.comment.get('comment-link'))
     resp['comment_object_name'] = responseData.comment.get('item-name')
@@ -60,6 +61,25 @@ def _set_task_list_infos(resp, data):
     return resp
 
 
+def _set_board_column_infos(resp, data):
+    def get_board_column_tasks(columnId):
+        responseData = __get(
+            __urljoin('boards', 'columns', columnId, 'cards.json')
+        )
+        return [int(card.taskId) for card in responseData.cards]
+
+    responseData = __get(
+        __urljoin('projects', data.task.projectId, 'boards', 'columns.json'),
+    )
+    for column in responseData.columns:
+        print(data.task.id, get_board_column_tasks(column.id))
+        if data.task.id in get_board_column_tasks(column.id):
+            resp['column_name'] = column.name
+            resp['column_color'] = column.color
+            break
+    return resp
+
+
 def _set_author_infos(resp, data):
     resp['author_id'] = data.eventCreator.id
     resp['author_name'] = '%s %s' % (data.eventCreator.firstName,
@@ -73,14 +93,20 @@ def task_created(data):
     resp = _get_default_data()
     resp = _set_task_infos(resp, data)
     resp = _set_task_list_infos(resp, data)
+    resp = _set_board_column_infos(resp, data)
     resp = _set_author_infos(resp, data)
     resp = _set_project_infos(resp, data)
 
-    template = 'Created task %s at %s'
+    if not resp.get('column_name'):
+        return
+
+    template = 'Created task %s at %s in %s'
     task_link = '[%s](%s)' % (resp['task_name'], resp['task_link'])
     task_list_link = '[%s](%s)' % (resp['task_list_name'],
                                    resp['task_list_link'])
-    resp['text'] = template % (task_link, task_list_link)
+    column_name = ' in <font color="%s">%s</font>' % (resp['column_color'],
+                                                      resp['column_name'])
+    resp['text'] = template % (task_link, task_list_link, column_name)
     return resp
 
 

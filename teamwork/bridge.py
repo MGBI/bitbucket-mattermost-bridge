@@ -37,9 +37,10 @@ def bridge_hook():
             return msg, 400
         return "Done"
     else:
-        # In case there's no templat for the event
+        # In case there's no template for the event
         # throw an error
         print(event)
+        print(request.get_json())
         return "Couldn't handle this Teamwork event", 501
 
 

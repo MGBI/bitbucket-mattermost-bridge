@@ -1,11 +1,13 @@
 import os
 
+
 def get_env_setting(setting, default=None, obligatory=True):
     """Get the environment setting or return an exception"""
     var = os.getenv(setting) or default
-    if not var and obligatory:
+    if var is None and obligatory:
         raise ValueError('Set the {} env variable'.format(setting))
     return var
+
 
 # Config file, please set the following settings:
 

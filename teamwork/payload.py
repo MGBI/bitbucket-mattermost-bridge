@@ -61,6 +61,16 @@ def _set_task_list_infos(resp, data):
     return resp
 
 
+def _set_card_infos(resp, data):
+    resp['column_name'] = data.column.name
+    resp['column_color'] = data.column.color
+    resp['project_id'] = data.card.projectId
+    resp['task_id'] = data.card.taskId
+    resp['task_name'] = data.card.name
+    resp['task_link'] = __urljoin('#tasks', data.card.taskId)
+    return resp
+
+
 def _set_board_column_infos(resp, data):
     def get_board_column_tasks(columnId):
         responseData = __get(
@@ -80,6 +90,22 @@ def _set_board_column_infos(resp, data):
     return resp
 
 
+def _set_board_column_icon(resp, data):
+    column_name = resp['column_name']
+    if not column_name:
+        icon = ':white_circle:'
+    elif column_name == 'NEXT':
+        icon = ':large_blue_circle:'
+    elif column_name == 'CURRENT':
+        icon = ':diamond_shape_with_a_dot_inside:'
+    elif column_name == 'IN DEVELOPMENT':
+        icon = ':large_red_circle:'
+    elif column_name == 'ACCEPT':
+        icon = ':green_heart:'
+    resp['column_icon'] = icon
+    return resp
+
+
 def _set_author_infos(resp, data):
     resp['author_id'] = data.eventCreator.id
     resp['author_name'] = '%s %s' % (data.eventCreator.firstName,
@@ -91,9 +117,9 @@ def _set_author_infos(resp, data):
 
 def task_created(data):
     resp = _get_default_data()
-    resp = _set_task_infos(resp, data)
-    resp = _set_task_list_infos(resp, data)
+    resp = _set_card_infos(resp, data)
     resp = _set_board_column_infos(resp, data)
+    resp = _set_board_column_icon(resp, data)
     resp = _set_author_infos(resp, data)
     resp = _set_project_infos(resp, data)
 
@@ -104,9 +130,21 @@ def task_created(data):
     task_link = '[%s](%s)' % (resp['task_name'], resp['task_link'])
     task_list_link = '[%s](%s)' % (resp['task_list_name'],
                                    resp['task_list_link'])
-    column_name = ' in <font color="%s">%s</font>' % (resp['column_color'],
-                                                      resp['column_name'])
-    resp['text'] = template % (task_link, task_list_link, column_name)
+    column = '%s %s' % (resp['column_name'], resp['column_icon'])
+    resp['text'] = template % (task_link, task_list_link, column)
+    return resp
+
+
+def card_updated(data):
+    resp = _get_default_data()
+    resp = _set_task_infos(resp, data)
+    resp = _set_board_column_icon(resp, data)
+    resp = _set_author_infos(resp, data)
+
+    template = 'Moved task %s to %s'
+    task_link = '[%s](%s)' % (resp['task_name'], resp['task_link'])
+    column = '%s %s' % (resp['column_name'], resp['column_icon'])
+    resp['text'] = template % (task_link, column)
     return resp
 
 

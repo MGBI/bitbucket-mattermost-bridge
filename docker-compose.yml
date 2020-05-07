@@ -6,3 +6,4 @@ services:
     env_file: .env
     ports:
     - ${EXTERNAL_BRIDGE_LISTEN_PORT}:${BRIDGE_LISTEN_PORT}
+    restart: on-failure

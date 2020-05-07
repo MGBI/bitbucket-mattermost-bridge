@@ -117,7 +117,8 @@ def _set_author_infos(resp, data):
 
 def task_created(data):
     resp = _get_default_data()
-    resp = _set_card_infos(resp, data)
+    resp = _set_task_infos(resp, data)
+    resp = _set_task_list_infos(resp, data)
     resp = _set_board_column_infos(resp, data)
     resp = _set_board_column_icon(resp, data)
     resp = _set_author_infos(resp, data)
@@ -137,7 +138,7 @@ def task_created(data):
 
 def card_updated(data):
     resp = _get_default_data()
-    resp = _set_task_infos(resp, data)
+    resp = _set_card_infos(resp, data)
     resp = _set_board_column_icon(resp, data)
     resp = _set_author_infos(resp, data)
 

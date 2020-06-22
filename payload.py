@@ -149,8 +149,10 @@ def repo_commit_status_updated(data):
     if state == 'FAILED':
         userName = data.commit_status.commit.author.user.nickname or \
             data.commit_status.commit.author.user.username
+        icon = ':exclamation:'
         userName = str(userName or '').replace(' ', '').lower()
-        resp['text'] = '@%s %s' % (userName, resp['text'])
+        resp['text'] = '%s %s %s' % (icon, '@' + userName if userName else '',
+                                     resp['text'])
 
     return resp
 

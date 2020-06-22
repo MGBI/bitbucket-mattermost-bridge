@@ -82,7 +82,6 @@ def _set_board_column_infos(resp, data):
         __urljoin('projects', data.task.projectId, 'boards', 'columns.json'),
     )
     for column in responseData.columns:
-        print(data.task.id, get_board_column_tasks(column.id))
         if data.task.id in get_board_column_tasks(column.id):
             resp['column_name'] = column.name
             resp['column_color'] = column.color
@@ -91,15 +90,15 @@ def _set_board_column_infos(resp, data):
 
 
 def _set_board_column_icon(resp, data):
-    column_name = resp['column_name']
-    if not column_name:
+    column_name = resp.get('column_name', 'BACKLOG')
+    if column_name == 'BACKLOG':
         icon = ':white_circle:'
     elif column_name == 'NEXT':
         icon = ':large_blue_circle:'
     elif column_name == 'CURRENT':
         icon = ':diamond_shape_with_a_dot_inside:'
     elif column_name == 'IN DEVELOPMENT':
-        icon = ':large_red_circle:'
+        icon = ':red_circle:'
     elif column_name == 'ACCEPT':
         icon = ':green_heart:'
     resp['column_icon'] = icon

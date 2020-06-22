@@ -126,12 +126,12 @@ def task_created(data):
     if not resp.get('column_name'):
         return
 
-    template = 'Created task %s at %s in %s'
+    template = '[%s] Created task %s at %s'
+    column = '%s %s' % (resp['column_icon'], resp['column_name'])
     task_link = '[%s](%s)' % (resp['task_name'], resp['task_link'])
     task_list_link = '[%s](%s)' % (resp['task_list_name'],
                                    resp['task_list_link'])
-    column = '%s %s' % (resp['column_name'], resp['column_icon'])
-    resp['text'] = template % (task_link, task_list_link, column)
+    resp['text'] = template % (column, task_link, task_list_link)
     return resp
 
 

@@ -96,10 +96,10 @@ def _set_board_column_icon(resp, data):
     elif column_name == 'NEXT':
         icon = ':large_blue_circle:'
     elif column_name == 'CURRENT':
-        icon = ':diamond_shape_with_a_dot_inside:'
+        icon = ':black_circle_for_record:'
     elif column_name == 'IN DEVELOPMENT':
         icon = ':red_circle:'
-    elif column_name == 'ACCEPT':
+    elif column_name == 'TO ACCEPT':
         icon = ':green_heart:'
     resp['column_icon'] = icon
     return resp
@@ -143,7 +143,8 @@ def card_updated(data):
 
     template = 'Moved task %s to %s'
     task_link = '[%s](%s)' % (resp['task_name'], resp['task_link'])
-    column = '%s %s' % (resp['column_name'], resp['column_icon'])
+    column = '%s %s %s' % (resp['column_icon'], resp['column_name'],
+                           resp['column_icon'])
     resp['text'] = template % (task_link, column)
     return resp
 

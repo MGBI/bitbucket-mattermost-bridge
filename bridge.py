@@ -63,7 +63,7 @@ def bridge_hook(hook=''):
         try:
             submit_hook(output)
         except (ValueError, AttributeError) as e:
-            msg = str(request.get_json()) + '\n' + str(e)
+            msg = unicode(request.get_json()) + '\n' + unicode(e)
             print(msg)
             return msg, 400
         return "Done"

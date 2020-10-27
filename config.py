@@ -102,6 +102,18 @@ for i in range(1, max_maps):
         break
 
 
+# map a Bitbucket user to a Teamwork Chat handle
+bitbucket_handles_map = {
+}
+for i in range(1, max_maps):
+    try:
+        bitbucket_handles_map[
+            get_env_setting('BITBUCKET_USER_NICKNAME_%u' % i)] = \
+            get_env_setting('TEAMWORK_USER_HANDLE_%u' % i)
+    except ValueError:
+        break
+
+
 # map a Sentry user to a Teamwork Chat handle
 sentry_handles_map = {
 }

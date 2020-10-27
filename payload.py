@@ -147,11 +147,12 @@ def repo_commit_status_updated(data):
 
     resp['author_token'] = config.ci_api_token
     if state == 'FAILED':
-        userName = data.commit_status.commit.author.user.nickname or \
-            data.commit_status.commit.author.user.username
         icon = ':exclamation:'
-        userName = str(userName or '').replace(' ', '').lower()
-        resp['text'] = '%s %s %s' % (icon, '@' + userName if userName else '',
+        author_nickname = data.commit_status.commit.author.user.nickname or \
+            data.commit_status.commit.author.user.username
+        handle = author_nickname and \
+            config.bitbucket_handles_map.get(author_nickname)
+        resp['text'] = '%s %s %s' % (icon, '@' + handle if handle else '',
                                      resp['text'])
 
     return resp
